@@ -58,9 +58,38 @@ cp .env.example .env
 docker compose -f docker-compose.local.yml up -d --build
 ```
 
-运行后默认端口3000，可访问 `http://localhost:3000`。
+本地开发（前后端分开启动，需 Go 1.25+ 和 Bun）：
 
-如需要拉取提示词，可前往:`http://localhost:3000/admin/prompts`
+```bash
+cp .env.example .env
+mkdir -p data
+```
+
+终端 1，启动后端（仓库根目录，默认 `http://127.0.0.1:8080`）：
+
+```bash
+go run .
+```
+
+终端 2，启动前端（`web` 目录，默认 `http://localhost:3000`）：
+
+```bash
+cd web
+bun install
+bun run dev
+```
+
+后端端口不是 `8080` 时，启动前端前设置 `API_BASE_URL`，例如：
+
+```bash
+API_BASE_URL=http://127.0.0.1:8080 bun run dev
+```
+
+运行后默认端口 3000，可访问 `http://localhost:3000`。
+
+默认管理员账号：`admin` / `infinite-canvas`（可在 `.env` 中修改）。
+
+如需要拉取提示词，可前往：`http://localhost:3000/admin/prompts`
 
 ## New API 自动配置
 
