@@ -5,6 +5,7 @@ import (
 	"errors"
 	"io"
 	"net/http"
+	"path"
 	"regexp"
 	"strconv"
 	"strings"
@@ -101,6 +102,7 @@ func fetchText(baseURL, file string) (string, error) {
 
 func buildGptImage2Prompts() ([]model.Prompt, error) {
 	cases := map[string]string{}
+	caseImages := map[string]string{}
 	raw, err := fetchText(gptImage2RawBase, "data/ingested_tweets.json")
 	if err != nil {
 		return nil, err
@@ -115,6 +117,7 @@ func buildGptImage2Prompts() ([]model.Prompt, error) {
 			return nil, err
 		}
 		collectGptImage2Cases(cases, markdown)
+		collectGptImage2CaseImages(caseImages, markdown)
 	}
 	items := []model.Prompt{}
 	for _, item := range data.Records {
@@ -122,16 +125,36 @@ func buildGptImage2Prompts() ([]model.Prompt, error) {
 		if prompt == "" {
 			continue
 		}
-		image := gptImage2RawBase + "/" + item.ImageDir + "/output.jpg"
+		image := gptImage2CoverURL(item.ImageDir, item.TweetURL, caseImages)
 		items = append(items, model.Prompt{ID: "gpt-image-2-prompts-" + leftPad(len(items)+1), Title: item.Title, CoverURL: image, Prompt: prompt, Tags: tagsFromCategory(item.Category), CreatedAt: item.AddedAt, UpdatedAt: item.AddedAt, Preview: markdownPreview([]string{image})})
 	}
 	return items, nil
+}
+
+func gptImage2CoverURL(imageDir, tweetURL string, caseImages map[string]string) string {
+	if dir := strings.TrimSpace(imageDir); dir != "" {
+		return absoluteImage(gptImage2RawBase, dir+"/output.jpg")
+	}
+	return caseImages[tweetURL]
 }
 
 func collectGptImage2Cases(cases map[string]string, markdown string) {
 	re := regexp.MustCompile("(?s)### Case \\d+: \\[[^\\]]+\\]\\(([^)]+)\\).*?\\*\\*Prompt:\\*\\*\\s*\\r?\\n\\s*```[\\w-]*\\r?\\n(.*?)\\r?\\n```")
 	for _, match := range re.FindAllStringSubmatch(markdown, -1) {
 		cases[match[1]] = strings.TrimSpace(match[2])
+	}
+}
+
+func collectGptImage2CaseImages(images map[string]string, markdown string) {
+	re := regexp.MustCompile(`(?s)### Case \d+: \[[^\]]+\]\(([^)]+)\).*?(?:<img[^>]+src="([^"]+)"|!\[[^\]]*\]\(([^)]+)\))`)
+	for _, match := range re.FindAllStringSubmatch(markdown, -1) {
+		image := match[2]
+		if image == "" {
+			image = match[3]
+		}
+		if image = absoluteImage(gptImage2RawBase, image); image != "" {
+			images[match[1]] = image
+		}
 	}
 }
 
@@ -337,7 +360,11 @@ func absoluteImage(baseURL, image string) string {
 	if image == "" || strings.HasPrefix(image, "http://") || strings.HasPrefix(image, "https://") {
 		return image
 	}
-	return baseURL + "/" + strings.TrimLeft(strings.TrimPrefix(image, "."), "/")
+	image = path.Clean(strings.TrimSpace(image))
+	for strings.HasPrefix(image, "../") {
+		image = strings.TrimPrefix(image, "../")
+	}
+	return strings.TrimRight(baseURL, "/") + "/" + strings.TrimLeft(image, "/")
 }
 
 func leftPad(value int) string {
