@@ -5,17 +5,11 @@
 <h1 align="center">无限画布 (infinite-canvas)</h1>
 
 <p align="center">
-  <a href="https://linux.do/"><img src="https://img.shields.io/badge/Linux.do-Community-2b6de8?style=flat-square" alt="Linux.do"></a>
-  <a href="https://render.com/deploy?repo=https://github.com/basketikun/infinite-canvas"><img src="https://img.shields.io/badge/Render-Deploy-46e3b7?style=flat-square&logo=render&logoColor=111111" alt="Deploy to Render"></a>
-  <a href="https://github.com/basketikun/infinite-canvas"><img src="https://img.shields.io/github/stars/basketikun/infinite-canvas?style=flat-square&logo=github" alt="GitHub stars"></a>
-  <a href="VERSION"><img src="https://img.shields.io/badge/version-v0.2.0-2563eb?style=flat-square" alt="Version"></a>
-  <a href="LICENSE"><img src="https://img.shields.io/badge/license-AGPL--3.0-f97316?style=flat-square" alt="License"></a>
-  <a href="https://www.docker.com/"><img src="https://img.shields.io/badge/Docker-ready-2496ed?style=flat-square&logo=docker&logoColor=white" alt="Docker ready"></a>
-  <a href="https://nextjs.org/"><img src="https://img.shields.io/badge/Next.js-16.2-000000?style=flat-square&logo=nextdotjs" alt="Next.js"></a>
-  <a href="https://go.dev/"><img src="https://img.shields.io/badge/Go-1.25-00add8?style=flat-square&logo=go&logoColor=white" alt="Go"></a>
+  <a href="https://render.com/deploy?repo=https://github.com/SongLove/infinite-canvas"><img src="https://img.shields.io/badge/Render-Deploy-46e3b7?style=flat-square&logo=render&logoColor=111111" alt="Deploy to Render"></a>
+  <a href="https://github.com/SongLove/infinite-canvas"><img src="https://img.shields.io/github/stars/SongLove/infinite-canvas?style=flat-square&logo=github" alt="GitHub stars"></a>
 </p>
 
-无限画布是一款面向图片创作的开源工作台。它把画布编排、AI 图片生成、参考图编辑、对话助手、提示词库和素材沉淀放在同一个界面里，适合用来探索视觉方案并连续迭代图片结果。
+本仓库由 [SongLove](https://github.com/SongLove) 维护与发布。项目基于社区开源无限画布工作，二次开发请保留原作者信息与前端页面标识。
 
 > [!CAUTION]
 > 项目目前处于开发阶段，不保证历史数据兼容。各种数据库结构和存储格式都可能直接调整，欢迎关注后续更新，当前更适合个人/本地部署，不建议直接公网多人共用。
@@ -39,17 +33,14 @@
 - 后端：Go、Gin、GORM。
 - 部署：Docker。
 
-## 快速开始
-
-[![Deploy to Render](https://render.com/images/deploy-to-render-button.svg)](https://render.com/deploy?repo=https://github.com/basketikun/infinite-canvas)
+[![Deploy to Render](https://render.com/images/deploy-to-render-button.svg)](https://render.com/deploy?repo=https://github.com/SongLove/infinite-canvas)
 
 ```bash
-git clone git@github.com:basketikun/infinite-canvas.git
+git clone git@github.com:SongLove/infinite-canvas.git
 cd infinite-canvas
 cp .env.example .env
 # 修改默认账号密码等信息
 docker-compose up -d
-```
 
 本地源码构建运行：
 
