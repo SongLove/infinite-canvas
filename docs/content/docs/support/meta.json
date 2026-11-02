@@ -1,9 +1,6 @@
 {
-  "title": "赞助支持",
+  "title": "Support and Security",
   "root": true,
   "defaultOpen": true,
-  "pages": [
-    "donate",
-    "sponsor"
-  ]
+  "pages": ["security", "sponsor"]
 }

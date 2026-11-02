@@ -1,31 +1,19 @@
-"use client";
-
 import type { ReactNode } from "react";
 import { useEffect, useRef } from "react";
-import { usePathname } from "next/navigation";
 import { App } from "antd";
+import { useTranslation } from "react-i18next";
 
 import { useConfigStore } from "@/stores/use-config-store";
-import { useUserStore } from "@/stores/use-user-store";
+import { usePromptSourceScheduler } from "@/hooks/use-prompt-source-scheduler";
 
 export function ClientRootInit({ children }: { children: ReactNode }) {
     const { message } = App.useApp();
+    const { t } = useTranslation();
     const handledConfigParams = useRef(false);
-    const pathname = usePathname();
-    const hydrateUser = useUserStore((state) => state.hydrateUser);
-    const loadPublicSettings = useConfigStore((state) => state.loadPublicSettings);
-    const publicSettings = useConfigStore((state) => state.publicSettings);
-    const updateConfig = useConfigStore((state) => state.updateConfig);
+    const importChannelCredentials = useConfigStore((state) => state.importChannelCredentials);
     const openConfigDialog = useConfigStore((state) => state.openConfigDialog);
-    const isLoginPage = pathname === "/login" || pathname === "/admin/login";
 
-    useEffect(() => {
-        void loadPublicSettings();
-    }, [loadPublicSettings]);
-
-    useEffect(() => {
-        if (!isLoginPage) void hydrateUser();
-    }, [hydrateUser, isLoginPage]);
+    usePromptSourceScheduler();
 
     useEffect(() => {
         if (handledConfigParams.current) return;
@@ -33,23 +21,19 @@ export function ClientRootInit({ children }: { children: ReactNode }) {
         const baseUrl = searchParams.get("baseUrl") || searchParams.get("baseurl");
         const apiKey = searchParams.get("apiKey") || searchParams.get("apikey");
         if (!baseUrl && !apiKey) return;
-        if (!publicSettings) return;
         handledConfigParams.current = true;
         searchParams.delete("baseUrl");
         searchParams.delete("baseurl");
         searchParams.delete("apiKey");
         searchParams.delete("apikey");
         window.history.replaceState(null, "", `${window.location.pathname}${searchParams.size ? `?${searchParams}` : ""}${window.location.hash}`);
-        if (!publicSettings.modelChannel.allowCustomChannel) {
-            openConfigDialog(false);
-            message.error("后台未允许用户自定义渠道，请联系管理员进行配置");
-            return;
-        }
-        updateConfig("channelMode", "local");
-        if (baseUrl) updateConfig("baseUrl", baseUrl);
-        if (apiKey) updateConfig("apiKey", apiKey);
-        openConfigDialog(false);
-    }, [message, openConfigDialog, publicSettings, updateConfig]);
+        const result = importChannelCredentials({ baseUrl, apiKey });
+        openConfigDialog(false, "channels");
+        if (result.status === "created") message.success(t("config.importedChannelCreated", { name: result.channelName }));
+        else if (result.status === "updated") message.success(t("config.importedChannelUpdated", { name: result.channelName }));
+        else if (result.status === "missing-base-url") message.error(t("config.importedChannelBaseUrlRequired"));
+        else message.error(t("config.importedChannelBaseUrlInvalid"));
+    }, [importChannelCredentials, message, openConfigDialog, t]);
 
     return <>{children}</>;
 }

@@ -1,50 +1,38 @@
 ---
-title: 快速开始
-description: 用最少步骤把无限画布跑起来
+title: Quick Start
+description: Run Infinite Canvas in a few steps
 ---
 
-# 快速开始
+# Quick Start
 
-如果你只是想先把项目跑起来，优先使用 Docker。
+To try the project, deploy or start the `web/` frontend.
 
-## Docker 启动
+## Deploy with Vercel
+
+Import the repository into Vercel. The root `vercel.json` builds `web/`. AI requests are sent directly from the browser to your OpenAI-compatible endpoint, so no additional application server is required.
+
+## Run locally
 
 ```bash
 git clone git@github.com:basketikun/infinite-canvas.git
-cd infinite-canvas
-cp .env.example .env
-docker compose up -d
+cd infinite-canvas/web
+bun install
+bun run dev
 ```
 
-启动后访问：
+Open `http://localhost:3000`.
 
-```text
-http://localhost:3000
-```
-
-默认管理员账号：
-
-```text
-用户名：admin
-密码：.env 中的 ADMIN_PASSWORD
-```
-
-## 本地构建镜像启动
-
-如果你需要基于当前源码本地构建镜像：
+## Run with Docker
 
 ```bash
-cp .env.example .env
-docker compose -f docker-compose.local.yml up -d --build
+docker build -t infinite-canvas .
+docker run --rm -p 3000:3000 infinite-canvas
 ```
 
-## 首次使用建议
+## First-time setup
 
-- 先打开右上角配置弹窗，填入自己的 `Base URL`、`API Key` 和模型名。
-- 如果使用后台渠道模式，再去管理后台补充系统模型与渠道配置。
-- 如果需要提示词仓库内容，可进入 `/admin/prompts` 拉取或同步。
+- Open Settings and enter your `Base URL`, `API Key`, and model names.
+- Open `/prompts` to fetch prompt repositories directly from the browser and cache them in IndexedDB.
+- Configure WebDAV if you want to synchronize canvases, assets, and generation history across devices.
 
-## 说明
-
-- 当前画布项目和“我的素材”主要保存在浏览器本地，不支持云同步。
-- 本地直连模式下，AI API Key 保存在浏览器本地，并由前端直接请求 OpenAI 兼容接口。
+Canvas projects and My Assets are primarily stored in the browser. The API key is also stored locally and used by the browser to call OpenAI-compatible endpoints directly.
